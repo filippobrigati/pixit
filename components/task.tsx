@@ -10,22 +10,22 @@ import { Task as TaskInterface } from "@/database/types";
 import { format } from "date-fns";
 import { PencilIcon, PrinterIcon, TrashIcon } from "lucide-react";
 
-export default function Task({ data }: { data: TaskInterface }) {
+export default function Task({ data, index }: { data: TaskInterface, index: number }) {
     return (
         <div>
             <ContextMenu>
                 <ContextMenuTrigger>
                     <div className="items-top flex space-x-2">
-                        <Checkbox id={data.id.toString()} />
+                        <Checkbox id={index.toString()} />
                         <div className="grid gap-1 leading-none">
                             <label
-                                htmlFor={data.id.toString()}
+                                htmlFor={index.toString()}
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex flex-row justify-start items-center"
                             >
                                 {data.title}
                                 <span className="flex h-2 w-2 rounded-full bg-sky-500 mx-2" />
                             </label>
-                            <label htmlFor={data.id.toString()} className="text-sm text-muted-foreground">
+                            <label htmlFor={index.toString()} className="text-sm text-muted-foreground">
                                 {data.description}
                             </label>
                             {data.date ? <span className="text-sm text-muted-foreground italic">

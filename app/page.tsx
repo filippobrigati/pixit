@@ -53,7 +53,7 @@ export default function Home() {
         <Filter />
       </div>
       <div className="space-y-8 h-[calc(100%-16rem)] overflow-y-auto">
-        {data.map((d: TaskInterface) => <Task key={d.id} data={d} />)}
+        {data.map((d: TaskInterface, index: number) => <Task key={index} data={d} index={index} />)}
       </div>
     </div>
   );
