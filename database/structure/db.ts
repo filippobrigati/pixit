@@ -48,7 +48,7 @@ export async function initDB() {
                 if (oldVersion === 0) {
                     const initialConfig: Config = {
                         key: 'default',
-                        username: "",
+                        username: "default",
                         showConnectionBadge: true,
                         showFilterButton: true,
                         showDebugMessageInToast: true,

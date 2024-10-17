@@ -40,7 +40,7 @@ export default function Username({ children, isDefaultOpen }: { children: React.
                     <DialogHeader>
                         <DialogTitle>Welcome in Pixit!</DialogTitle>
                         <DialogDescription>
-                            It's time not to forget things, what's your name?
+                            Let's get started, what's your name?
                         </DialogDescription>
                     </DialogHeader>
                     <ProfileForm setIsOpen={setIsOpen} />
@@ -58,7 +58,7 @@ export default function Username({ children, isDefaultOpen }: { children: React.
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Welcome in Pixit!</DrawerTitle>
                     <DrawerDescription>
-                        It's time not to forget things, what's your name?
+                        Let's get started, what's your name?
                     </DrawerDescription>
                 </DrawerHeader>
                 <ProfileForm className="px-4" setIsOpen={setIsOpen} />
@@ -75,10 +75,10 @@ interface TaskFormProps {
 function ProfileForm({ className, setIsOpen }: TaskFormProps) {
     const { toast } = useToast();
 
+    const savedUsername = useConfigStore((state) => state.username);
     const updateUsernameInStore = useConfigStore((state) => state.updateUserName);
 
     const username = React.useRef<HTMLInputElement>(null);
-
 
     const saveUsername = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -103,7 +103,7 @@ function ProfileForm({ className, setIsOpen }: TaskFormProps) {
     return (
         <form className={cn("flex flex-col gap-4 pb-6 sm:pb-0", className)}>
             <div className="grid gap-2">
-                <Input type="text" id="name" ref={username} />
+                <Input type="text" id="name" ref={username} defaultValue={savedUsername === "default" ? "Your name" : savedUsername} />
             </div>
             <div className="w-full flex sm:justify-end">
                 <Button type="submit" className="w-full sm:w-[100px]" onClick={(e) => saveUsername(e)}>Okey</Button>

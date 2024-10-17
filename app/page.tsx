@@ -59,7 +59,14 @@ export default function Home() {
     <div className="w-full h-full">
       <div className="flex flex-col sm:flex-row justify-between items-start">
         <div>
-          <p className="text-sm text-muted-foreground">Hi, <Username isDefaultOpen={!isLoading && username.length <= 0 ? true : false}><span className="hover:underline hover:cursor-pointer">{username}</span></Username></p>
+          <p className="text-sm text-muted-foreground">Hi,
+            {
+              isLoading ? null :
+                <Username isDefaultOpen={username === "default" ? true : false}>
+                  <span className="hover:underline hover:cursor-pointer">{username}</span>
+                </Username>
+            }
+          </p>
           <p className="text-sm text-muted-foreground">You have <b>{tasks.length}</b> uncompleted tasks.</p>
           {showConnectionBadge ? <NetworkBadge /> : null}
         </div>
@@ -70,7 +77,10 @@ export default function Home() {
       </div>
       <div className="mt-10 md:mt-24 mb-3 w-full flex flex-row justify-between items-center">
         <Create />
-        {showFilterButton ? <Filter currentPriority={priorityFilter} priorityf={setPriorityFilter} currentDate={dateFilter} datef={setDateFilter} /> : null}
+        {showFilterButton ?
+          <Filter currentPriority={priorityFilter} priorityf={setPriorityFilter} currentDate={dateFilter} datef={setDateFilter} /> :
+          null
+        }
       </div>
       <div className="space-y-8 h-[calc(100%-16rem)] overflow-y-auto">
         {
