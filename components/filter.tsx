@@ -16,8 +16,32 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 
-export function Filter() {
-    const [date, setDate] = React.useState<Date>();
+export function Filter({
+    priorityf,
+    datef,
+    currentPriority,
+    currentDate,
+}: {
+    priorityf: (priority: "LOW" | "MEDIUM" | "URGENT" | null) => void;
+    datef: (date: Date | null) => void;
+    currentPriority: "LOW" | "MEDIUM" | "URGENT" | null;
+    currentDate: Date | null;
+}) {
+    // Handle changes in priority
+    const handlePriorityChange = (value: string) => {
+        let newPriority: "LOW" | "MEDIUM" | "URGENT" | null = null;
+        if (value === "NULL") {
+            priorityf(null); // Update parent component
+        } else {
+            newPriority = value.toUpperCase() as "LOW" | "MEDIUM" | "URGENT";
+            priorityf(newPriority);
+        }
+    };
+
+    // Handle date selection
+    const handleDateChange = (selectedDate: Date | undefined) => {
+        datef(selectedDate || null); // Update parent component
+    };
 
     return (
         <Popover>
@@ -38,15 +62,16 @@ export function Filter() {
                     <div className="flex flex-col gap-2">
                         <div className="w-full items-center gap-4">
                             <Label htmlFor="width">priority</Label>
-                            <Select>
+                            <Select onValueChange={handlePriorityChange} value={currentPriority ? currentPriority?.toUpperCase().toString() : "NULL"}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select priority" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="low">Low</SelectItem>
-                                        <SelectItem value="medium">Medium</SelectItem>
-                                        <SelectItem value="urgent">Urgent</SelectItem>
+                                        <SelectItem value="NULL" defaultChecked >Select filter</SelectItem>
+                                        <SelectItem value="LOW">Low</SelectItem>
+                                        <SelectItem value="MEDIUM">Medium</SelectItem>
+                                        <SelectItem value="URGENT">Urgent</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -59,25 +84,28 @@ export function Filter() {
                                         variant={"outline"}
                                         className={cn(
                                             "w-full justify-start text-left font-normal",
-                                            !date && "text-muted-foreground"
+                                            !currentDate && "text-muted-foreground"
                                         )}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                        {currentDate ? format(currentDate, "PPP") : <span>Pick a date</span>}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
-                                        selected={date}
-                                        onSelect={setDate}
+                                        selected={currentDate as Date}
+                                        onSelect={handleDateChange}
                                         initialFocus
                                     />
                                 </PopoverContent>
                             </Popover>
                         </div>
                     </div>
-                    <Button variant={'outline'}>Reset</Button>
+                    <Button variant={'outline'} onClick={() => {
+                        priorityf(null);
+                        datef(null);
+                    }}>Reset</Button>
                 </div>
             </PopoverContent>
         </Popover>

@@ -25,10 +25,15 @@ import {
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PlusIcon } from "lucide-react"
+import { CalendarIcon, PlusIcon } from "lucide-react"
 import { Textarea } from "./ui/textarea"
 import { Task as TaskInterface } from "@/database/types"
 import { addTask } from "@/database/query/translaction"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import { format } from "date-fns"
+import { Calendar } from "./ui/calendar"
+import { useTaskStore } from "@/database/structure/zu"
 
 export function Create() {
     const [open, setOpen] = React.useState(false)
@@ -90,22 +95,31 @@ interface TaskFormProps {
 function TaskForm({ className, setOpen }: TaskFormProps) {
     const title = React.useRef<HTMLInputElement>(null);
     const description = React.useRef<HTMLTextAreaElement>(null);
+    
+    const [priority, setPriority] = React.useState<"LOW" | "MEDIUM" | "URGENT">("LOW");
+    const [date, setDate] = React.useState<Date>();
 
-    const saveTask = async () => {
+    const addTaskStore = useTaskStore((state) => state.addTask);
+
+    const saveTask = async (event: React.FormEvent) => {
+        event.preventDefault();
+
         if (!title.current || !description.current) return;
         const task: TaskInterface = {
             title: title.current.value as string, // Get the value from the ref
             description: description.current.value as string, // Get the value from the ref
-            date: new Date(),
+            date: date as Date,
+            priority: priority,
             completed: false
-        }
-
-        const id = await addTask(task);
-        if (id) {
-            setOpen(false);
+        } as TaskInterface; // Avoid typescript error on missing field ID
+        // Save data in indexedDB
+        const { data, error } = await addTask(task);
+        if (error) {
+            alert(error);
         } else {
-            alert("Error occurred");
+            addTaskStore(data as TaskInterface);
         }
+        setOpen(false);
     }
 
     return (
@@ -118,7 +132,47 @@ function TaskForm({ className, setOpen }: TaskFormProps) {
                 <Label htmlFor="desc">Description</Label>
                 <Textarea placeholder="Oh, I did not logged it." rows={3} ref={description} />
             </div>
-            <Button type="submit" onClick={() => saveTask()}>Save it</Button>
+            <div className="grid gap-2">
+                <Label htmlFor="width">Priority</Label>
+                <Select required onValueChange={(val) => setPriority(val as  "LOW" | "MEDIUM" | "URGENT")}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectItem value="LOW">Low</SelectItem>
+                            <SelectItem value="MEDIUM">Medium</SelectItem>
+                            <SelectItem value="URGENT">Urgent</SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="grid gap-2">
+                <Label htmlFor="maxWidth">Expiring date</Label>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !date && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            initialFocus
+                        />
+                    </PopoverContent>
+                </Popover>
+            </div>
+            <Button type="submit" onClick={(e) => saveTask(e)}>Save it</Button>
         </form>
     )
 }

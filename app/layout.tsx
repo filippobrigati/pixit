@@ -3,6 +3,8 @@ import { JetBrains_Mono } from 'next/font/google';
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
+import { Toaster } from "@/components/ui/toaster";
+
 const font = JetBrains_Mono({ weight: ["400", "700"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -29,6 +31,7 @@ export default function RootLayout({
           <div className="max-w-3xl mx-auto p-4 sm:pt-20 h-screen">
             {children}
           </div>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
