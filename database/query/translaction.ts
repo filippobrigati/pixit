@@ -1,5 +1,5 @@
 import { openDB } from 'idb';
-import { Config, Task, Task as TaskInterface } from '../types';
+import { Config, Response, Task, Task as TaskInterface } from '../types';
 import { MyDBV1 } from '../structure/db';
 
 async function openDatabase() {
@@ -7,7 +7,7 @@ async function openDatabase() {
     return db;
 }
 
-export async function addTask(task: TaskInterface): Promise<{ data: Task | null, error: string | null }> {
+export async function addTask(task: TaskInterface): Promise<Response> {
     try {
         const db = await openDatabase();
         const tx = db.transaction('task', 'readwrite');
@@ -62,7 +62,6 @@ export async function updateUsername(username: string): Promise<boolean> {
 
         // Fetch the current config
         const currentConf: Config | undefined = await store.get("default");
-
         // If no config exists, you might want to handle this case
         if (!currentConf) {
             throw new Error("Configuration not found");
@@ -80,5 +79,33 @@ export async function updateUsername(username: string): Promise<boolean> {
     } catch (e) {
         alert(e);
         return false;
+    }
+}
+
+export async function updateConfig(conn: boolean, filter: boolean, debug: boolean): Promise<Response> {
+    try {
+        const db = await openDatabase();
+        const tx = db.transaction("config", "readwrite");
+
+        const store = tx.objectStore("config");
+
+        const currentConf: Config | undefined = await store.get("default");
+        if (!currentConf) {
+            throw new Error("Configuration not found");
+        }
+
+        const updatedConf: Config = {
+            ...currentConf,
+            showConnectionBadge: conn,
+            showDebugMessageInToast: debug,
+            showFilterButton: filter,
+        };
+
+        await store.put(updatedConf);
+        await tx.done;
+
+        return { data: updatedConf, error: null };
+    } catch (e: any) {
+        return { data: null, error: e.message };
     }
 }

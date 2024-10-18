@@ -30,6 +30,8 @@ export default function Username({ children, isDefaultOpen }: { children: React.
     const isDesktop = useMediaQuery("(min-width: 768px)")
     const [isOpen, setIsOpen] = React.useState(isDefaultOpen);
 
+    const savedUsername = useConfigStore((state) => state.username);
+
     if (isDesktop) {
         return (
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -38,9 +40,9 @@ export default function Username({ children, isDefaultOpen }: { children: React.
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Welcome in Pixit!</DialogTitle>
+                        <DialogTitle>{savedUsername === "default" ? "Welcome in Pixit!" : "Change username"}</DialogTitle>
                         <DialogDescription>
-                            Let's get started, what's your name?
+                            {savedUsername === "default" ? "Let's get started, what's your name?" : "Type your new username"}
                         </DialogDescription>
                     </DialogHeader>
                     <ProfileForm setIsOpen={setIsOpen} />
@@ -56,9 +58,9 @@ export default function Username({ children, isDefaultOpen }: { children: React.
             </DrawerTrigger>
             <DrawerContent>
                 <DrawerHeader className="text-left">
-                    <DrawerTitle>Welcome in Pixit!</DrawerTitle>
+                    <DrawerTitle>{savedUsername === "default" ? "Welcome in Pixit!" : "Change username"}</DrawerTitle>
                     <DrawerDescription>
-                        Let's get started, what's your name?
+                        {savedUsername === "default" ? "Let's get started, what's your name?" : "Type your new username"}
                     </DrawerDescription>
                 </DrawerHeader>
                 <ProfileForm className="px-4" setIsOpen={setIsOpen} />

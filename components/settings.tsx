@@ -23,12 +23,12 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PlusIcon, SettingsIcon } from "lucide-react"
-import { Textarea } from "./ui/textarea"
+import { SettingsIcon } from "lucide-react"
 import { Switch } from "./ui/switch"
 import { useConfigStore } from "@/database/structure/zu"
+import { updateConfig } from "@/database/query/translaction"
+import { useToast } from "@/hooks/use-toast"
 
 export function Settings() {
     const [open, setOpen] = React.useState(false)
@@ -83,6 +83,8 @@ export function Settings() {
 }
 
 function SettingsContent({ className }: React.ComponentProps<"form">) {
+    const { toast } = useToast();
+
     const updateShowConnectionBadge = useConfigStore((state) => state.updateShowConnectionBadge);
     const updateShowFilterButton = useConfigStore((state) => state.updateShowFilterButton);
     const updateShowDebugMessageInToast = useConfigStore((state) => state.updateShowDebugMessageInToast);
@@ -91,35 +93,66 @@ function SettingsContent({ className }: React.ComponentProps<"form">) {
     const showDebugMessageInToast = useConfigStore((state) => state.showDebugMessageInToast);
     const showFilterButton = useConfigStore((state) => state.showFilterButton);
 
+    const updateSettings = async (item: "conn" | "filter" | "debug", value: boolean) => {
+        try {
+            switch (item) {
+                case "conn":
+                    const { error: eConn } = await updateConfig(value, showFilterButton, showDebugMessageInToast);
+                    if (eConn) throw new Error(eConn);
+                    updateShowConnectionBadge(value);
+                    break;
+                case "filter":
+                    const { error: eFilt } = await updateConfig(value, showFilterButton, showDebugMessageInToast);
+                    if (eFilt) throw new Error(eFilt);
+                    updateShowFilterButton(value);
+                    break;
+                case "debug":
+                    const { error: eDeb } = await updateConfig(value, showFilterButton, showDebugMessageInToast);
+                    if (eDeb) throw new Error(eDeb);
+                    updateShowDebugMessageInToast(value);
+                    break;
+            }
+
+            toast({
+                title: "Settings updated correcty",
+            });
+        } catch (e: any) {
+            toast({
+                title: "Error",
+                description: "Something went wrong!"
+            });
+        }
+    }
+
     return (
         <div className={cn("flex flex-col items-start gap-4", className)}>
             <div className="w-full flex flex-row justify-between items-center">
                 <Label htmlFor="connection-badge">Show connection state badge</Label>
                 <Switch id="connection-badge" checked={showConnectionBadge}
-                    onCheckedChange={updateShowConnectionBadge} />
+                    onCheckedChange={(v) => updateSettings("conn", v)} />
             </div>
             <div className="w-full flex flex-row justify-between items-center">
                 <Label htmlFor="filter-button">Show filter button</Label>
                 <Switch id="filter-button" checked={showFilterButton}
-                    onCheckedChange={updateShowFilterButton} />
+                    onCheckedChange={(v) => updateSettings("filter", v)} />
             </div>
             <span className="text-sm text-muted-foreground">Developer options</span>
             <div className="w-full flex flex-row justify-between items-center">
-                <Label htmlFor="indexed-db">Save data locally to save loading time</Label>
-                <Switch id="indexed-db" />
-            </div>
-            <div className="w-full flex flex-row justify-between items-center">
                 <Label htmlFor="error-toast">Show debug message in error toast</Label>
                 <Switch id="error-toast" checked={showDebugMessageInToast}
-                    onCheckedChange={updateShowDebugMessageInToast} />
+                    onCheckedChange={(v) => updateSettings("debug", v)} />
+            </div>
+            <span className="text-sm text-muted-foreground">Integrations</span>
+            <div className="w-full flex flex-row justify-between items-center">
+                <Label htmlFor="error-toast">Connect with google calendar</Label>
+            </div>
+            <div className="w-full flex flex-row justify-between items-center">
+                <Label htmlFor="error-toast">Connect with supabase</Label>
             </div>
             <span className="text-sm text-muted-foreground">Account settings</span>
             <div className="w-full grid grid-cols-12 gap-4">
-                <Button variant={'outline'} className="col-span-6 border-red-500 hover:border-red-700 hover:bg-red-700 hover:text-white">
-                    Delete local data
-                </Button>
-                <Button variant={'outline'} className="col-span-6 bg-red-500 border-red-500 hover:border-red-700 hover:bg-red-700 hover:text-white">
-                    Delete account
+                <Button variant={'outline'} className="col-span-12 border-red-500 hover:border-red-700 hover:bg-red-700 hover:text-white">
+                    Delete data
                 </Button>
             </div>
         </div>

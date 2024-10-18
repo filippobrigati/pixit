@@ -59,7 +59,7 @@ export default function Home() {
     <div className="w-full h-full">
       <div className="flex flex-col sm:flex-row justify-between items-start">
         <div>
-          <p className="text-sm text-muted-foreground">Hi,
+          <p className="text-sm text-muted-foreground">Hi,{" "}
             {
               isLoading ? null :
                 <Username isDefaultOpen={username === "default" ? true : false}>

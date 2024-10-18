@@ -14,3 +14,8 @@ export interface Config {
     showFilterButton: boolean;
     showDebugMessageInToast: boolean;
 }
+
+export interface Response {
+    data: any | null,
+    error: string | null
+}
