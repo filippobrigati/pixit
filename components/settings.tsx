@@ -145,14 +145,16 @@ function SettingsContent({ className }: React.ComponentProps<"form">) {
             <span className="text-sm text-muted-foreground">Integrations</span>
             <div className="w-full flex flex-row justify-between items-center">
                 <Label htmlFor="error-toast">Connect with google calendar</Label>
+                <span className="text-sm italic">Coming soon</span>
             </div>
             <div className="w-full flex flex-row justify-between items-center">
                 <Label htmlFor="error-toast">Connect with supabase</Label>
+                <span className="text-sm italic">Coming soon</span>
             </div>
             <span className="text-sm text-muted-foreground">Account settings</span>
-            <div className="w-full grid grid-cols-12 gap-4">
-                <Button variant={'outline'} className="col-span-12 border-red-500 hover:border-red-700 hover:bg-red-700 hover:text-white">
-                    Delete data
+            <div className="w-full flex justify-start gap-4">
+                <Button variant={'outline'} className="sm:w-1/2 w-full border-red-500 hover:border-red-700 hover:bg-red-700 hover:text-white">
+                    Delete local data
                 </Button>
             </div>
         </div>
